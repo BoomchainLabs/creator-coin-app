@@ -1,0 +1,71 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=${DATABASE_URL}
+      - POSTGRES_URL=${POSTGRES_URL}
+      - API_URL=${API_URL:-https://api.yourdomain.com}
+      - FRONTEND_URL=${FRONTEND_URL:-https://yourdomain.com}
+      - QUIKNODE_RPC_URL=${QUIKNODE_RPC_URL}
+      - PRIVATE_KEY=${PRIVATE_KEY}
+    volumes:
+      - backend-data:/data
+    networks:
+      - creator-coin-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=${API_URL:-https://api.yourdomain.com}
+      - NEXT_PUBLIC_QUIKNODE_RPC_URL=${QUIKNODE_RPC_URL}
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - creator-coin-network
+
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - creator-coin-network
+    depends_on:
+      - frontend
+      - backend
+    environment:
+      - DOMAIN=${DOMAIN:-yourdomain.com}
+
+volumes:
+  backend-data:
+  caddy-data:
+  caddy-config:
+
+networks:
+  creator-coin-network:
+    driver: bridge

@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "env": [
+    "NEXT_PUBLIC_API_URL",
+    "NEXT_PUBLIC_QUIKNODE_RPC_URL"
+  ],
+  "buildCommand": "pnpm -F frontend build",
+  "outputDirectory": "frontend/.next",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "${{ secrets.API_URL }}/api/:path*"
+    }
+  ]
+}

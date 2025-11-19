@@ -1,0 +1,92 @@
+@import 'tailwindcss';
+
+@theme inline {
+  --color-primary: #3B82F6;
+  --color-primary-dark: #1E40AF;
+  --color-accent: #10B981;
+  --color-accent-alt: #F59E0B;
+  --color-background: #0F1419;
+  --color-surface: #1A1F2E;
+  --color-surface-light: #252D3D;
+  --color-border: #3A4557;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #A8B2C1;
+  --color-text-tertiary: #7A8496;
+  --radius: 0.5rem;
+  --font-sans: 'Inter', 'Inter Fallback';
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+html {
+  color-scheme: dark;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+/* Fixed @apply directive - separated classes properly */
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-feature-settings: 'rlig' 1, 'calt' 1;
+}
+
+/* Utility classes for crypto app */
+.gradient-primary {
+  background: linear-gradient(135deg, #3B82F6, #10B981);
+}
+
+.gradient-accent {
+  background: linear-gradient(135deg, #10B981, #06B6D4);
+}
+
+.card-base {
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.card-hover {
+  transition: all 200ms;
+}
+
+.card-hover:hover {
+  background-color: var(--color-surface-light);
+  border-color: var(--color-primary);
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 0.625rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  transition: all 200ms;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.btn-secondary {
+  background-color: var(--color-surface-light);
+  color: var(--color-text-primary);
+  padding: 0.625rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+  transition: all 200ms;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-surface);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #3B82F6, #10B981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

@@ -1,0 +1,16 @@
+yourdomain.com, www.yourdomain.com {
+  reverse_proxy frontend:3000
+}
+
+api.yourdomain.com {
+  reverse_proxy backend:3001
+}
+
+@websocket {
+  header Connection *Upgrade*
+  header Upgrade websocket
+}
+
+handle @websocket {
+  reverse_proxy backend:3001
+}

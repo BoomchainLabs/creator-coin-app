@@ -1,0 +1,51 @@
+{
+  "name": "creator-coin-app",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "backend:build": "pnpm -F backend build",
+    "backend:dev": "pnpm -F backend dev",
+    "build": "pnpm -F frontend build && pnpm -F backend build",
+    "dev": "concurrently \"pnpm -F frontend dev\" \"pnpm -F backend dev\"",
+    "frontend:build": "pnpm -F frontend build",
+    "frontend:dev": "pnpm -F frontend dev",
+    "start": "pnpm -F backend start"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "latest",
+    "axios": "latest",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cors": "latest",
+    "dotenv": "latest",
+    "ethers": "latest",
+    "express": "latest",
+    "lucide-react": "^0.454.0",
+    "next": "16.0.3",
+    "node-gyp": "latest",
+    "path": "latest",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "sqlite3": "latest",
+    "tailwind-merge": "^2.5.5",
+    "tailwindcss-animate": "^1.0.7",
+    "url": "latest",
+    "util": "latest",
+    "uuid": "latest",
+    "viem": "latest",
+    "wagmi": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "19.2.6",
+    "@types/react-dom": "19.2.3",
+    "concurrently": "^8.2.2",
+    "postcss": "^8.5",
+    "tailwindcss": "4.1.17",
+    "typescript": "^5"
+  }
+}

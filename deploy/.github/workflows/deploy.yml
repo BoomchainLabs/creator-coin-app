@@ -1,0 +1,93 @@
+name: Deploy Creator Coin App
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+
+    - name: Get pnpm store directory
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
+
+    - name: Setup pnpm cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Build backend
+      run: pnpm build:backend
+
+    - name: Build frontend
+      run: pnpm build:frontend
+
+  deploy-backend:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Deploy backend to Railway
+      run: |
+        curl -X POST https://api.railway.app/graphql \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
+          -d '{
+            "query": "mutation { deploymentCreate(input: {projectId: \"'${{ secrets.RAILWAY_PROJECT_ID }}'\"}) { deployment { id } } }"
+          }'
+
+  deploy-frontend:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Deploy frontend to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        scope: ${{ secrets.VERCEL_ORG_ID }}
+
+  health-check:
+    needs: [deploy-backend, deploy-frontend]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check frontend health
+      run: |
+        sleep 30
+        curl -f https://${{ secrets.FRONTEND_DOMAIN }} || exit 1
+
+    - name: Check backend health
+      run: |
+        curl -f https://${{ secrets.API_DOMAIN }}/api/health || exit 1
+
+    - name: Notify deployment success
+      run: |
+        echo "✅ Deployment successful!"
+        echo "Frontend: https://${{ secrets.FRONTEND_DOMAIN }}"
+        echo "API: https://${{ secrets.API_DOMAIN }}"
